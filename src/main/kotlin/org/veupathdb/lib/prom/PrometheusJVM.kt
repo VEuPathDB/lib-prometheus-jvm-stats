@@ -43,13 +43,17 @@ object PrometheusJVM {
 
   /**
    * Enable JVM stats.
+   *
+   * @param resolution Frequency at which the JVM stats will be measured.  Value
+   * is in seconds.
    */
   @JvmStatic
-  fun enable() {
+  @JvmOverloads
+  fun enable(resolution: Int = 5) {
 
     Thread {
       while (true) {
-        Thread.sleep(500)
+        Thread.sleep(resolution * 1000L)
         calculate()
       }
     }.start()
