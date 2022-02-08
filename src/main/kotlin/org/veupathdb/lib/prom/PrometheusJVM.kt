@@ -52,7 +52,7 @@ object PrometheusJVM {
         Thread.sleep(500)
         calculate()
       }
-    }
+    }.start()
 
   }
 
