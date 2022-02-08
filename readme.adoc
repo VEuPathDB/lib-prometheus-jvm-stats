@@ -1,0 +1,6 @@
+= Prometheus JVM Stats
+
+Plugs JVM stats into the standard/default Prometheus instance managed by the
+SimpleClient library.
+
+This is an alternative to the JMX method of adding JVM metrics.
