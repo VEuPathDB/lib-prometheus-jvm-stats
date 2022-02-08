@@ -15,31 +15,31 @@ object PrometheusJVM {
   private val TotalMemory = Gauge.build()
     .name("process_total_memory")
     .help("Total memory allocated by this java process.")
-    .create()
+    .register()
 
   @JvmStatic
   private val FreeMemory = Gauge.build()
     .name("process_free_memory")
     .help("Unused allocated memory.")
-    .create()
+    .register()
 
   @JvmStatic
   private val UsedMemory = Gauge.build()
     .name("process_active_memory")
     .help("Allocated memory currently in use.")
-    .create()
+    .register()
 
   @JvmStatic
   private val GCCount = Summary.build()
     .name("gc_count")
     .help("Number of garbage collections.")
-    .create()
+    .register()
 
   @JvmStatic
   private val GCTime = Summary.build()
     .name("gc_time")
     .help("Total time used by the garbage collector.")
-    .create()
+    .register()
 
   /**
    * Enable JVM stats.
