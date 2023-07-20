@@ -67,7 +67,7 @@ object PrometheusJVM {
     val total: Long
     val free: Long
     val diff: Long
-    val memAfterGC: Long
+    val memAfterGC: Long?
 
     with(Runtime.getRuntime()) {
       total = totalMemory()
@@ -79,7 +79,7 @@ object PrometheusJVM {
     TotalMemory.set(total.toDouble())
     FreeMemory.set(free.toDouble())
     UsedMemory.set(diff.toDouble())
-    UsedMemoryAfterGC.set(memAfterGC.toDouble())
+    memAfterGC?.let { UsedMemoryAfterGC.set(it.toDouble()) }
 
     var totalGC = 0L
     var gcTime = 0L
@@ -93,13 +93,21 @@ object PrometheusJVM {
     GCTime.observe(gcTime.toDouble())
   }
 
-  private fun calculateMemoryAfterGC(): Long {
+  /**
+   * Returns memory after last garbage collection. Returns null if no GC has happened.
+   */
+  private fun calculateMemoryAfterGC(): Long? {
     val mxbeans: List<com.sun.management.GarbageCollectorMXBean> =
       ManagementFactory.getPlatformMXBeans(com.sun.management.GarbageCollectorMXBean::class.java)
 
-    return mxbeans
+    val memUsedByPool = mxbeans
+      .filter { it.lastGcInfo.memoryUsageAfterGc != null }
       .flatMap { it.lastGcInfo.memoryUsageAfterGc.values }
       .map { it.used }
-      .reduce { totalUsed: Long, used: Long -> totalUsed + used }
+    if (!memUsedByPool.isEmpty()) {
+      return memUsedByPool.reduce { totalUsed: Long, used: Long -> totalUsed + used }
+    } else {
+      return null
+    }
   }
 }
