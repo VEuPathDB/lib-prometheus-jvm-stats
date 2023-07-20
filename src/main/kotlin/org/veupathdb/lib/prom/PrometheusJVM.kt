@@ -30,6 +30,12 @@ object PrometheusJVM {
     .register()
 
   @JvmStatic
+  private val UsedMemoryAfterGC = Gauge.build()
+    .name("process_active_memory_after_gc")
+    .help("Allocated memory currently in use after garbage collection. This can be indicative of memory accounted for by long-lived objects.")
+    .register()
+
+  @JvmStatic
   private val GCCount = Summary.build()
     .name("gc_count")
     .help("Number of garbage collections.")
@@ -61,26 +67,39 @@ object PrometheusJVM {
     val total: Long
     val free: Long
     val diff: Long
+    val memAfterGC: Long
 
     with(Runtime.getRuntime()) {
       total = totalMemory()
-      free  = freeMemory()
-      diff  = total - free
+      free = freeMemory()
+      diff = total - free
+      memAfterGC = calculateMemoryAfterGC()
     }
 
     TotalMemory.set(total.toDouble())
     FreeMemory.set(free.toDouble())
     UsedMemory.set(diff.toDouble())
+    UsedMemoryAfterGC.set(memAfterGC.toDouble())
 
     var totalGC = 0L
     var gcTime = 0L
 
     ManagementFactory.getGarbageCollectorMXBeans().forEach {
       totalGC += it.collectionCount
-      gcTime  += it.collectionTime
+      gcTime += it.collectionTime
     }
 
     GCCount.observe(totalGC.toDouble())
     GCTime.observe(gcTime.toDouble())
+  }
+
+  private fun calculateMemoryAfterGC(): Long {
+    val mxbeans: List<com.sun.management.GarbageCollectorMXBean> =
+      ManagementFactory.getPlatformMXBeans(com.sun.management.GarbageCollectorMXBean::class.java)
+
+    return mxbeans
+      .flatMap { it.lastGcInfo.memoryUsageAfterGc.values }
+      .map { it.used }
+      .reduce { totalUsed: Long, used: Long -> totalUsed + used }
   }
 }
