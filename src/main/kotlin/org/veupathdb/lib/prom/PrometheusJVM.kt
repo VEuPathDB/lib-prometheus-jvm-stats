@@ -101,9 +101,11 @@ object PrometheusJVM {
       ManagementFactory.getPlatformMXBeans(com.sun.management.GarbageCollectorMXBean::class.java)
 
     val memUsedByPool = mxbeans
+      .filter { it.name.contains("G1 Young Generation") }
       .filter { it.lastGcInfo != null }
-      .flatMap { it.lastGcInfo.memoryUsageAfterGc.values }
-      .map { it.used }
+      .flatMap { it.lastGcInfo.memoryUsageAfterGc.entries }
+      .filter { it.key.contains("G1") }
+      .map { it.value.used }
     if (!memUsedByPool.isEmpty()) {
       return memUsedByPool.reduce { totalUsed: Long, used: Long -> totalUsed + used }
     } else {
