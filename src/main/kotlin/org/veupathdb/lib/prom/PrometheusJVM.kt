@@ -47,6 +47,12 @@ object PrometheusJVM {
     .help("Total time used by the garbage collector.")
     .register()
 
+  @JvmStatic
+  private val Threads = Gauge.build()
+    .name("thread_count")
+    .help("Number of active threads.")
+    .register()
+
   /**
    * Enable JVM stats.
    */
@@ -89,6 +95,8 @@ object PrometheusJVM {
       gcTime += it.collectionTime
     }
 
+    Threads.set(ManagementFactory.getThreadMXBean().threadCount.toDouble())
+
     GCCount.observe(totalGC.toDouble())
     GCTime.observe(gcTime.toDouble())
   }
@@ -106,10 +114,11 @@ object PrometheusJVM {
       .flatMap { it.lastGcInfo.memoryUsageAfterGc.entries }
       .filter { it.key.contains("G1") }
       .map { it.value.used }
-    if (!memUsedByPool.isEmpty()) {
-      return memUsedByPool.reduce { totalUsed: Long, used: Long -> totalUsed + used }
+
+    return if (memUsedByPool.isNotEmpty()) {
+      memUsedByPool.reduce { totalUsed: Long, used: Long -> totalUsed + used }
     } else {
-      return null
+      null
     }
   }
 }

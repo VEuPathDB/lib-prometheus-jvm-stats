@@ -3,12 +3,12 @@ import org.jetbrains.dokka.gradle.DokkaTask
 plugins {
   `java-library`
   `maven-publish`
-  kotlin("jvm") version "1.6.10"
-  id("org.jetbrains.dokka") version "1.6.10"
+  kotlin("jvm") version "1.9.23"
+  id("org.jetbrains.dokka") version "1.9.23"
 }
 
 group = "org.veupathdb.lib"
-version = "1.2.3"
+version = "1.3.0"
 
 repositories {
   mavenCentral()
@@ -16,8 +16,8 @@ repositories {
 
 dependencies {
   implementation(kotlin("stdlib"))
-  implementation("io.prometheus:simpleclient:0.14.1")
-  implementation("io.prometheus:simpleclient_common:0.14.1")
+  implementation("io.prometheus:simpleclient:0.16.0")
+  implementation("io.prometheus:simpleclient_common:0.16.0")
 }
 
 kotlin {
