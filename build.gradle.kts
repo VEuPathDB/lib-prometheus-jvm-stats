@@ -1,10 +1,7 @@
-import org.jetbrains.dokka.gradle.DokkaTask
-
 plugins {
-  `java-library`
   `maven-publish`
-  kotlin("jvm") version "1.9.23"
-  id("org.jetbrains.dokka") version "1.9.20"
+  alias(libs.plugins.kotlin)
+  alias(libs.plugins.dokka)
 }
 
 group = "org.veupathdb.lib"
@@ -15,34 +12,17 @@ repositories {
 }
 
 dependencies {
-  implementation(kotlin("stdlib"))
   implementation("io.prometheus:simpleclient:0.16.0")
   implementation("io.prometheus:simpleclient_common:0.16.0")
 }
 
 kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(8))
-  }
+  jvmToolchain(21)
 }
 
 java {
   withJavadocJar()
   withSourcesJar()
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-  kotlinOptions {
-    jvmTarget = "1.8"
-    freeCompilerArgs = listOf("-Xjvm-default=all")
-  }
-}
-
-tasks.withType<DokkaTask>().configureEach {
-  dokkaSourceSets.configureEach {
-    includeNonPublic.set(false)
-    jdkVersion.set(8)
-  }
 }
 
 publishing {

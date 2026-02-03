@@ -1,0 +1,10 @@
+[versions]
+prometheus = "0.16.0"
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version = "2.3.0" }
+dokka  = { id = "org.jetbrains.dokka", version = "2.1.0" }
+
+[libraries]
+prometheus-client = { module = "io.prometheus:simpleclient", version.ref = "prometheus" }
+prometheus-common = { module = "io.prometheus:simpleclient_common", version.ref = "prometheus" }
