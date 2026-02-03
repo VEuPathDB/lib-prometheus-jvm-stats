@@ -12,8 +12,8 @@ repositories {
 }
 
 dependencies {
-  implementation("io.prometheus:simpleclient:0.16.0")
-  implementation("io.prometheus:simpleclient_common:0.16.0")
+  implementation(libs.prometheus.client)
+  implementation(libs.prometheus.common)
 }
 
 kotlin {
